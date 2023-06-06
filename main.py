@@ -5,6 +5,10 @@ from starlette.responses import StreamingResponse
 
 app = FastAPI()
 
+@app.get("/")
+def welcome():
+    return "A very long journey is indeed boring, But the memories of cheese burger remains unduplicated.\n- Borgar"
+
 @app.post("/text")
 async def write_text_on_image(image: UploadFile = File(...), text: str = None):
     # Read the uploaded image
@@ -13,7 +17,8 @@ async def write_text_on_image(image: UploadFile = File(...), text: str = None):
     img = Image.open(image_stream).convert("RGBA")
 
     # Define the font and size
-    font = ImageFont.truetype("/workspaces/Meme-generator-API/Oswald-Bold.ttf", size=30)
+    text_size=int(img.height/6)
+    font = ImageFont.truetype("/workspaces/Meme-generator-API/Oswald-Bold.ttf", text_size)
 
     # Create a transparent layer for text
     text_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
@@ -25,7 +30,7 @@ async def write_text_on_image(image: UploadFile = File(...), text: str = None):
     y = (img.height - text_height) - 20
 
     # Draw the text on the text layer with stroke
-    stroke_width = 2
+    stroke_width = text_size/15
     stroke_color = (0, 0, 0, 255)
     draw.text((x - stroke_width, y - stroke_width), text, font=font, fill=stroke_color)
     draw.text((x + stroke_width, y - stroke_width), text, font=font, fill=stroke_color)
@@ -48,5 +53,4 @@ async def write_text_on_image(image: UploadFile = File(...), text: str = None):
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run(app, host="0.0.0.0", port=8000)
